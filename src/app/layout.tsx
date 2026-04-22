@@ -18,6 +18,8 @@ export const metadata: Metadata = {
     "Automatically scrape and store the latest developer jobs from LinkedIn into a clean, searchable dashboard. Never miss your next opportunity.",
 };
 
+import { Providers } from "./providers";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -28,7 +30,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

@@ -10,7 +10,7 @@ export async function scrapeLinkedInJobs() {
 
   try {
     const url =
-      "https://www.linkedin.com/jobs/search/?keywords=developer&location=India&sortBy=DD";
+      "https://www.linkedin.com/jobs/search/?keywords=developer&location=India&sortBy=DD&f_TPR=r3600";
 
     await page.setUserAgent(
       "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"

@@ -1,5 +1,6 @@
 @import "tailwindcss";
 
+/* 
 :root {
   --bg-page: #eef2f7;
   --bg-white: #ffffff;
@@ -35,4 +36,4 @@ body {
   font-family: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
-}
+}  */

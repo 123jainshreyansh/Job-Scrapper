@@ -11,7 +11,11 @@ const navLinks = [
   { label: 'Dashboard', href: '/dashboard' },
 ];
 
-export default function Navbar() {
+interface NavbarProps {
+  className?: string;
+}
+
+export default function Navbar({ className }: NavbarProps) {
   const pathname = usePathname();
   const [isScraping, setIsScraping] = useState(false);
 
@@ -36,7 +40,10 @@ export default function Navbar() {
   };
 
   return (
-    <nav style={{ width: '100%', borderBottom: '1px solid #e2e8f0', background: '#fff', position: 'sticky', top: 0, zIndex: 100 }}>
+    <nav 
+      className={className}
+      style={{ width: '100%', borderBottom: '1px solid #e2e8f0', background: '#fff', position: 'sticky', top: 0, zIndex: 100 }}
+    >
       <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '12px 32px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
 
         {/* Logo */}
