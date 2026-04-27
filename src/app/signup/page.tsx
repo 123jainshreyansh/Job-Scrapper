@@ -4,7 +4,7 @@ import { Navbar } from "./navbar";
 import { Left } from "./left";
 import { Right } from "./right";
 
-export default function Login() {
+export default function Signup() {
   return (
     <div
       className="min-h-screen w-full flex flex-col"

@@ -3,6 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import { useSession, signOut } from "next-auth/react";
 
 const navLinks = [
   { label: 'Home', href: '/' },
@@ -19,18 +20,23 @@ export default function Navbar({ className }: NavbarProps) {
   const pathname = usePathname();
   const [isScraping, setIsScraping] = useState(false);
 
+  // `useSession` reads the JWT cookie set by NextAuth.
+  // status === "authenticated"  → user is signed in
+  // status === "unauthenticated" → user is signed out / first-time visitor
+  // status === "loading"         → still checking (show nothing / spinner)
+  const { data: session, status } = useSession();
+  const isLoggedIn = status === "authenticated";
+
+  // ── Scrape handler ─────────────────────────────────────────────────────────
+  // Only reachable when signed in (button is hidden otherwise).
   const handleScrape = async () => {
     if (isScraping) return;
-    
     setIsScraping(true);
     try {
       const res = await fetch('/api/scrape');
       const data = await res.json();
       alert(`Scraped ${data.totalScraped} jobs!`);
-      // Optionally refresh the page if we are on the jobs page
-      if (pathname === '/jobs') {
-        window.location.reload();
-      }
+      if (pathname === '/jobs') window.location.reload();
     } catch (error) {
       console.error("Scrape failed:", error);
       alert("Failed to scrape jobs. Check the console for details.");
@@ -76,31 +82,87 @@ export default function Navbar({ className }: NavbarProps) {
           })}
         </div>
 
-        {/* Right Side Buttons */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <button style={{ color: '#4b5563', background: 'none', border: 'none', cursor: 'pointer', fontSize: '15px', fontWeight: '500' }}>
-            Sign in
-          </button>
-          <button 
-            onClick={handleScrape}
-            disabled={isScraping}
-            style={{ 
-              background: isScraping ? '#94a3b8' : '#4f46e5', 
-              color: '#fff', 
-              padding: '8px 18px', 
-              borderRadius: '8px', 
-              border: 'none', 
-              cursor: isScraping ? 'not-allowed' : 'pointer', 
-              fontWeight: '600', 
-              fontSize: '15px', 
-              display: 'flex', 
-              alignItems: 'center', 
-              gap: '4px',
-              transition: 'all 0.2s'
-            }}
-          >
-            {isScraping ? 'Scraping...' : 'Scrape Jobs'} <span style={{ fontSize: '13px' }}>{isScraping ? '⌛' : '›'}</span>
-          </button>
+        {/* ── Right side — changes based on auth state ──────────────────────── */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+
+          {/* SIGNED OUT: show Sign in + Get Started */}
+          {!isLoggedIn && (
+            <>
+              <Link
+                href="/login"
+                style={{ color: '#4b5563', fontSize: '15px', fontWeight: '500', textDecoration: 'none' }}
+              >
+                Sign in
+              </Link>
+              <Link
+                href="/signup"
+                style={{
+                  background: '#4f46e5',
+                  color: '#fff',
+                  padding: '8px 18px',
+                  borderRadius: '8px',
+                  fontWeight: '600',
+                  fontSize: '15px',
+                  textDecoration: 'none',
+                  transition: 'background 0.2s',
+                }}
+              >
+                Get Started
+              </Link>
+            </>
+          )}
+
+          {/* SIGNED IN: show Scrape Jobs button + user name + Sign Out */}
+          {isLoggedIn && (
+            <>
+              {/* Scrape Jobs — only visible when authenticated */}
+              <button
+                onClick={handleScrape}
+                disabled={isScraping}
+                style={{
+                  background: isScraping ? '#94a3b8' : '#4f46e5',
+                  color: '#fff',
+                  padding: '8px 18px',
+                  borderRadius: '8px',
+                  border: 'none',
+                  cursor: isScraping ? 'not-allowed' : 'pointer',
+                  fontWeight: '600',
+                  fontSize: '15px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  transition: 'all 0.2s',
+                }}
+              >
+                {isScraping ? 'Scraping...' : 'Scrape Jobs'}
+                <span style={{ fontSize: '13px' }}>{isScraping ? '⌛' : '›'}</span>
+              </button>
+
+              {/* User greeting */}
+              <span style={{ fontSize: '14px', color: '#64748b', fontWeight: '500' }}>
+                Hi, {session?.user?.name?.split(' ')[0] ?? 'User'}
+              </span>
+
+              {/* Sign Out */}
+              <button
+                onClick={() => signOut({ callbackUrl: '/' })}
+                style={{
+                  color: '#ef4444',
+                  background: 'none',
+                  border: '1px solid #fecaca',
+                  borderRadius: '8px',
+                  padding: '6px 14px',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  transition: 'all 0.2s',
+                }}
+              >
+                Sign Out
+              </button>
+            </>
+          )}
+
         </div>
 
       </div>

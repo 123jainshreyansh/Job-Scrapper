@@ -1,6 +1,6 @@
 // No "use client" — this panel has no interactivity.
 import React from "react";
-import { ZapIcon, LockIcon } from "./icons";
+import { SearchIcon, LayoutIcon } from "./icons";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 interface Feature {
@@ -12,16 +12,16 @@ interface Feature {
 // ── Data ───────────────────────────────────────────────────────────────────────
 const FEATURES: Feature[] = [
   {
-    icon: <ZapIcon />,
-    title: "Instant Access",
+    icon: <SearchIcon />,
+    title: "Fresh Job Discovery",
     description:
-      "Sign in quickly using Google or GitHub to jump right back into your search.",
+      "Automatically scrape newly posted developer roles without manually searching every day.",
   },
   {
-    icon: <LockIcon />,
-    title: "Secure & Encrypted",
+    icon: <LayoutIcon />,
+    title: "Organized Dashboard",
     description:
-      "Your data and saved preferences are safely stored and encrypted at rest.",
+      "Review job title, company, location, and application links in one focused workspace.",
   },
 ];
 
@@ -36,13 +36,13 @@ const FeatureCard = ({ icon, title, description }: Feature) => (
   </div>
 );
 
-const UpdateBadge = () => (
+const NewBadge = () => (
   <span className="inline-flex items-center gap-2 bg-white/60 backdrop-blur-sm border border-indigo-200 rounded-full px-4 py-1.5 text-sm">
     <span className="bg-indigo-600 text-white text-xs font-bold px-2 py-0.5 rounded-full tracking-wide">
-      UPDATE
+      NEW
     </span>
     <span className="text-gray-600 font-medium">
-      Now supporting GitHub authentication
+      Create your account in under a minute
     </span>
   </span>
 );
@@ -51,18 +51,20 @@ const UpdateBadge = () => (
 export const Left = () => (
   <div className="flex-1 flex flex-col justify-center">
     <div className="mb-6">
-      <UpdateBadge />
+      <NewBadge />
     </div>
 
     <h1 className="text-5xl font-extrabold text-gray-900 leading-tight tracking-tight mb-4">
-      Welcome back to
+      Start tracking
       <br />
-      your dashboard
+      developer jobs
+      <br />
+      faster
     </h1>
 
     <p className="text-gray-500 text-base leading-relaxed mb-10 max-w-sm">
-      Log in to continue finding the perfect developer roles. Access your saved
-      jobs, manage your automated scraping tasks, and track your applications.
+      Sign up to scrape fresh LinkedIn roles, organize job listings in one clean
+      dashboard, and stay updated with new openings automatically.
     </p>
 
     <div className="flex gap-8">
