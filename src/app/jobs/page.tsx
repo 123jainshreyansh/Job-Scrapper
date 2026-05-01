@@ -13,15 +13,20 @@ const INITIAL_FILTERS: FiltersState = {
   techStack: { react: false, nodejs: false, typescript: false, python: false },
 };
 
-function matchesWorkspace(location: string, workspace: FiltersState['workspace']): boolean {
+function matchesWorkspace(location: string, title: string, workspace: FiltersState['workspace']): boolean {
   const active = Object.values(workspace).some(Boolean);
-  if (!active) return true; // no workspace filter active → show all
-  const loc = location.toLowerCase();
-  if (workspace.remote && loc.includes('remote')) return true;
-  if (workspace.hybrid && loc.includes('hybrid')) return true;
-  if (workspace.onsite && (loc.includes('on-site') || loc.includes('onsite') || loc.includes('in-person'))) return true;
-  // If a workspace filter is active but none of the above matched, also allow non-matching
-  // jobs that don't indicate workspace type (ambiguous) only if no remote/hybrid match
+  if (!active) return true; // no filter active → show all
+
+  // Search both location AND title — LinkedIn often puts "Remote" in the job title
+  const text = (location + ' ' + title).toLowerCase();
+  const isRemote = text.includes('remote');
+  const isHybrid = text.includes('hybrid');
+  // Jobs with no remote/hybrid keyword are treated as on-site / in-office
+  const isOnsite = text.includes('on-site') || text.includes('onsite') || (!isRemote && !isHybrid);
+
+  if (workspace.remote && isRemote) return true;
+  if (workspace.hybrid && isHybrid) return true;
+  if (workspace.onsite && isOnsite) return true;
   return false;
 }
 
@@ -97,7 +102,7 @@ export default function JobsPage() {
 
     // Sidebar filters
     result = result.filter(job =>
-      matchesWorkspace(job.location || '', filters.workspace) &&
+      matchesWorkspace(job.location || '', job.title || '', filters.workspace) &&
       matchesExperience(job.title || '', filters.experience) &&
       matchesTechStack(job.title || '', job.description || '', filters.techStack)
     );
