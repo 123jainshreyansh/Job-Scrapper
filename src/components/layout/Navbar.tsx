@@ -16,6 +16,51 @@ interface NavbarProps {
   className?: string;
 }
 
+function SignOutButton() {
+  const [isHovered, setIsHovered] = useState(false);
+  return (
+    <button
+      onClick={() => signOut({ callbackUrl: '/' })}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      style={{
+        color: isHovered ? '#fff' : '#dc2626',
+        background: isHovered ? '#dc2626' : 'transparent',
+        border: isHovered ? '1px solid #dc2626' : '1px solid #fca5a5',
+        borderRadius: '8px',
+        padding: '7px 15px',
+        cursor: 'pointer',
+        fontSize: '14px',
+        fontWeight: '500',
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: '6px',
+        transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+        boxShadow: isHovered 
+          ? '0 4px 12px rgba(220, 38, 38, 0.25)' 
+          : '0 1px 2px rgba(0, 0, 0, 0.02)',
+      }}
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="15"
+        height="15"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+        <polyline points="16 17 21 12 16 7" />
+        <line x1="21" y1="12" x2="9" y2="12" />
+      </svg>
+      Sign Out
+    </button>
+  );
+}
+
 export default function Navbar({ className }: NavbarProps) {
   const pathname = usePathname();
   const [isScraping, setIsScraping] = useState(false);
@@ -144,22 +189,7 @@ export default function Navbar({ className }: NavbarProps) {
               </span>
 
               {/* Sign Out */}
-              <button
-                onClick={() => signOut({ callbackUrl: '/' })}
-                style={{
-                  color: '#ef4444',
-                  background: 'none',
-                  border: '1px solid #fecaca',
-                  borderRadius: '8px',
-                  padding: '6px 14px',
-                  cursor: 'pointer',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  transition: 'all 0.2s',
-                }}
-              >
-                Sign Out
-              </button>
+              <SignOutButton />
             </>
           )}
 

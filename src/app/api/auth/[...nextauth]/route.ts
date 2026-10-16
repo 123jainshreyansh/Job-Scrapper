@@ -1,4 +1,5 @@
-import NextAuth from "next-auth";
+
+import NextAuth, { type NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import GitHubProvider from "next-auth/providers/github";
 import CredentialsProvider from "next-auth/providers/credentials";
@@ -7,8 +8,8 @@ import bcrypt from "bcryptjs";
 import dbConnect from "../../../../lib/dbConnect";
 import User from "../../../../model/User";
 
-// Named export so other server files can do: getServerSession(authOptions)
-export const authOptions = {
+// Shared configuration for getServerSession(authOptions)
+export const authOptions: NextAuthOptions = {
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID || "",
@@ -29,20 +30,28 @@ export const authOptions = {
       },
 
       async authorize(credentials) {
+        if (!credentials?.email || !credentials.password) {
+          return null;
+        }
+
         await dbConnect();
 
         const user = await User.findOne({
-          email: credentials?.email,
+          email: credentials.email,
         });
 
-        if (!user) throw new Error("User not found");
+        if (!user || !user.password) {
+          return null;
+        }
 
         const isMatch = await bcrypt.compare(
-          credentials!.password,
-          user.password,
+          credentials.password,
+          user.password
         );
 
-        if (!isMatch) throw new Error("Wrong password");
+        if (!isMatch) {
+          return null;
+        }
 
         return {
           id: user._id.toString(),
@@ -57,14 +66,21 @@ export const authOptions = {
     async signIn({ user, account }) {
       await dbConnect();
 
-      if (account?.provider === "google" || account?.provider === "github") {
+      if (
+        account?.provider === "google" ||
+        account?.provider === "github"
+      ) {
+        if (!user.email) {
+          return false;
+        }
+
         const existingUser = await User.findOne({
           email: user.email,
         });
 
         if (!existingUser) {
           await User.create({
-            name: user.name,
+            name: user.name ?? "",
             email: user.email,
             password: "",
             provider: account.provider,
@@ -76,13 +92,18 @@ export const authOptions = {
     },
 
     async jwt({ token, user }) {
-      if (user) token.id = user.id;
+      if (user) {
+        token.id = user.id;
+      }
+
       return token;
     },
 
     async session({ session, token }) {
       if (session.user) {
-        session.user.id = token.id as string;
+        // Add the custom ID without changing the default session fields.
+        (session.user as typeof session.user & { id: string }).id =
+          String(token.id ?? "");
       }
 
       return session;
@@ -101,4 +122,5 @@ export const authOptions = {
 };
 
 const handler = NextAuth(authOptions);
+
 export { handler as GET, handler as POST };
